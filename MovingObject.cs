@@ -6,25 +6,28 @@ public class MovingObject : MonoBehaviour {
 
     IEnumerator walkingCorutine()
     {
-        if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
+        while (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
         {
-            bool ispreesedShiftKey = false;
-            canMove = false;
-
-            while (currentWalkCount < walkCount) {
-                if (Input.GetKey(KeyCode.LeftShift)) {
-                    runspeed = 2.0f;
-                    ispreesedShiftKey = true;
-                }
-                else runspeed = 0;
-                vector.Set(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"), transform.position.z);
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                applyRunSpeed = runspeed;
+                ispreesedShiftKey = true;
+            }
+            else
+            {
+                applyRunSpeed = 0;
+                ispreesedShiftKey = false;
+            }
+            vector.Set(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"), transform.position.z);
+            while (currentWalkCount < walkCount)
+            {
                 if (vector.x != 0)
                 {
-                    transform.Translate(vector.x * (runspeed + speed), 0, 0);
+                    transform.Translate(vector.x * (applyRunSpeed + speed), 0, 0);
                 }
                 if (vector.y != 0)
                 {
-                    transform.Translate(0, vector.y * (speed + runspeed), 0);
+                    transform.Translate(0, vector.y * (speed + applyRunSpeed), 0);
                 }
                 if (ispreesedShiftKey) currentWalkCount++;
                 currentWalkCount++;
@@ -34,12 +37,14 @@ public class MovingObject : MonoBehaviour {
             currentWalkCount = 0;
         }
     }
-
+    bool ispreesedShiftKey = false;
     bool canMove = true;
+
     public float speed;
     private Vector3 vector;
     // Use this for initialization
-    private float runspeed;
+    public float runspeed;
+    private float applyRunSpeed;
     public int walkCount;
     private int currentWalkCount = 0;
 
@@ -51,7 +56,8 @@ public class MovingObject : MonoBehaviour {
 	void Update () {
         if(canMove)
 		if(Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0){
-            StartCoroutine (walkingCorutine());
+                canMove = false;
+                StartCoroutine (walkingCorutine());
         }
     }
 }
