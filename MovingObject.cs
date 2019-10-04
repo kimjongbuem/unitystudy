@@ -6,7 +6,7 @@ public class MovingObject : MonoBehaviour {
 
     IEnumerator walkingCorutine()
     {
-        while (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
+        if(Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
         {
             if (Input.GetKey(KeyCode.LeftShift))
             {
