@@ -4,12 +4,18 @@ using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
+    static public CameraManager instance;
     public GameObject target; // camera가 따라갈 대상
     public float moveSpeed;// 카메라의 속도
     private Vector3 targetPosition; // 대상의 현재 위치값.
     void Start()
     {
-        DontDestroyOnLoad(this.gameObject);
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(this.gameObject);
+        }
+        else Destroy(this.gameObject);
     }
 
     // Update is called once per frame

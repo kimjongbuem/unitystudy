@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class MovingObject : MonoBehaviour
 {
+    static public MovingObject instance;
     private BoxCollider2D boxColider;
     public LayerMask layerMask;// 통과불가
 
@@ -23,9 +24,14 @@ public class MovingObject : MonoBehaviour
 
     void Start()
     {
-        DontDestroyOnLoad(this.gameObject); // 이 오브젝트를 다른씬으로 갈때마다 파괴 ㄴㄴ
-        boxColider = GetComponent<BoxCollider2D>();
-        animator = GetComponent<Animator>();    
+        if(instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(this.gameObject); // 이 오브젝트를 다른씬으로 갈때마다 파괴 ㄴㄴ
+            boxColider = GetComponent<BoxCollider2D>();
+            animator = GetComponent<Animator>();
+        }
+        else Destroy(this.gameObject);
     }
 
     void Update()
