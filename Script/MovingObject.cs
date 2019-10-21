@@ -11,8 +11,10 @@ public class MovingObject : MonoBehaviour
     public float speed;
     private Vector3 vector;
     public float runSpeed;
+
     // Start is called before the first frame update
     // Update is called once per frame
+
     private float applyRunSpeed;
     public int walkCount;
     private int currentWalkCount = 0;
