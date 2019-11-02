@@ -1,0 +1,44 @@
+3강 테스트뷰, 에디트 텍스트 , 이미지 뷰 속성들 : p94 95 98
+
+4강 drawableLeft 이미지 : 왼쪽.
+
+5강 xml menu파일생성
+res-> 오른쪽 버튼 new Directory메뉴로 res 폴더 아래에 menu폴더 생성한다.
+menu폴더 위에서 마우스 오른쪽 버튼을 눌러서 new ->menu resource file -> 이름지정
+옵션메뉴 생성하기 : onCreateOptionMenu
+
+MenuInflater inflater =getMenuInflater();
+inflater.inflate(R.menu.mymenu, menu); // inflate는 메뉴 리소스를 팽창시켜서 메뉴객체로 만든다.
+mymenu.xml에 의해 정의된 메뉴 리소스가 메뉴 객체로 팽창됨.
+
+클릭이벤트 처리시 : Menu add...
+onOptionItemSelected(MenuItem item) <= switch(item.getItemId( ) ) .... R.id...
+
+컨텍스트 메뉴
+onCreateContextMenu
+
+체크박스 클릭리스너
+check.setOnCheckedChangeListener
+
+팝업메뉴
+PopupMenu .setOnItemClickListener
+
+대화상자.
+
+
+과제 : setOnKeyListener
+
+8강 액티비티와 인텐트
+
+인텐트는 암시적, 명시적 인텐트가 있다.
+키워드 Intent , nextActivity.class, startActivity(intent obj);
+Activtiy other class 정의 후 매니페스트 파일추가
+<activity android:name-"Activtiyothername" android:label-"Activity2"></activity> finish( )
+
+intent.putExtra, getIntent,getIntExtra 
+setResult
+
+암시적 인텐트 p352
+
+
+데이터베이스)
