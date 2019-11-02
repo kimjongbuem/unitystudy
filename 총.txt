@@ -1,0 +1,34 @@
+발자국 소리까지 오디오 매니저를 통한.. 내용 까지 총정리..
+
+일단 움직이는 객체를 만들어줘야한다. 코루틴사용
+스프라이트를 랜더링하고 거기다 관련함수들 추가 :getXisRaw. getComponet, FindObject, 싱글턴 패턴사용
+Animator, Animation ,AudioSource <= 오디오관리 매니저 객체 스크립트 작성,  blend tree를 통한 값설정.  박스컬라이더, 
+RaycastHit2D, LayerMask 객체 생성 (레이어 마스크는 값 설정을 해줘야한다.)
+후 해당 움직일부분으로 레이저를 쏴서 확인한다. Physics2D.Linecast(start, end, layerMask);
+
+카메라는
+해당 움직이는 오브젝트를 따라서 가야하니,
+Camera component, 
+minBound = bound.bounds.min; maxBound = bound.bounds.max;
+halfHeight = theCamera.orthographicSize;
+halfWIdth = halfHeight * Screen.width / Screen.height; ! 그진 공식임. 맵밖이 안보이게 ㅋ
+
+카메라, 플레이어는 DonDestoryOnLoad( this.gameObject);
+
+카메라, 플레이어 정보 가지고옴.
+맵이동:
+
+같은씬이동 : 
+타겟 Bound객체를 통해 해당 카메라가 보여질 범위를 지정한다 <=setBound
+그리고 같은씬이동 위치 오브젝트를 만들어서 위치를 지정한다. 끝. onTriggerEnter2D
+
+다른씬이동
+collision.gameobject.name == "Player" => SceneManager.LoadScene(MapName); <= 빌드셋팅
+
+오디오 매니저
+clip [System.Serializable] , loop 이런 내용이 AudioSource에 들어가야 한다.
+GameObject soundObj = new GameObject("사운드 파일 이름 :" + i 
+                + " =" + sounds[i].name);
+            sounds[i].setSource(soundObj.AddComponent<AudioSource>());
+            soundObj.transform.SetParent(this.transform);
+source.Play() // 해당 소스 플레이!
