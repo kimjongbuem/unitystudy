@@ -23,7 +23,17 @@ public class MovingObject : MonoBehaviour
     private Animator animator;
 
     public string currentMapName; // 
+    //
+    //public AudioClip walksound1;
+    //public AudioClip walksound2;
+    private AudioSource audioSource;
 
+    public string walkSound_1;
+    public string walkSound_2;
+    public string walkSound_3;
+    public string walkSound_4;
+
+    private AudioManager _audioManager;
     void Start()
     {
         if(instance == null)
@@ -32,6 +42,8 @@ public class MovingObject : MonoBehaviour
             DontDestroyOnLoad(this.gameObject); // 이 오브젝트를 다른씬으로 갈때마다 파괴 ㄴㄴ
             boxColider = GetComponent<BoxCollider2D>();
             animator = GetComponent<Animator>();
+            audioSource = GetComponent<AudioSource>();
+            _audioManager = FindObjectOfType<AudioManager>();
         }
         else Destroy(this.gameObject);
     }
@@ -76,6 +88,23 @@ public class MovingObject : MonoBehaviour
 
             animator.SetBool("Walking", true);
 
+                int temp = Random.Range(1, 4);
+                switch (temp)
+                {
+                    case 1:
+                        _audioManager.Play(walkSound_1);
+                        break;
+                    case 2:
+                        _audioManager.Play(walkSound_2);
+                        break;
+                    case 3:
+                        _audioManager.Play(walkSound_3);
+                        break;
+                    case 4:
+                        _audioManager.Play(walkSound_4);
+                        break;
+                }
+                //audioSource.Play();
             while (currentWalkCount < walkCount)
             {
                 if (vector.x != 0) transform.Translate((applyRunSpeed + speed) * vector.x, 0, 0);
@@ -84,6 +113,7 @@ public class MovingObject : MonoBehaviour
                 if (applyRunFlag) currentWalkCount++;
                 currentWalkCount++;
                 yield return new WaitForSeconds(0.01f);
+                
             }
             currentWalkCount = 0;
         }
