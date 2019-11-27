@@ -4,120 +4,98 @@ using UnityEngine;
 
 public class MovingObject : MonoBehaviour
 {
-    static public MovingObject instance;
-    private BoxCollider2D boxColider;
-    public LayerMask layerMask;// 통과불가
-
-    public float speed;
-    private Vector3 vector;
-    public float runSpeed;
-
-    // Start is called before the first frame update
-    // Update is called once per frame
-
-    private float applyRunSpeed;
+    public string characterName;
+    public BoxCollider2D boxColider;
     public int walkCount;
-    private int currentWalkCount = 0;
-    private bool canMove = true;
-    private bool applyRunFlag = false;
-    private Animator animator;
+    private bool notCor = false;
+    public LayerMask layerMask;// 통과불가
+    public float speed;
+    protected Vector3 vector;
+    public Animator animator;
+    public Queue<string> queue;
+   protected int currentWalkCount = 0;
 
-    public string currentMapName; // 
-    //
-    //public AudioClip walksound1;
-    //public AudioClip walksound2;
-    private AudioSource audioSource;
-
-    public string walkSound_1;
-    public string walkSound_2;
-    public string walkSound_3;
-    public string walkSound_4;
-
-    private AudioManager _audioManager;
-    void Start()
+    public void Move(string direction, int frequency = 5)
     {
-        if(instance == null)
+        queue.Enqueue(direction);
+        if (!notCor)
         {
-            instance = this;
-            DontDestroyOnLoad(this.gameObject); // 이 오브젝트를 다른씬으로 갈때마다 파괴 ㄴㄴ
-            boxColider = GetComponent<BoxCollider2D>();
-            animator = GetComponent<Animator>();
-            audioSource = GetComponent<AudioSource>();
-            _audioManager = FindObjectOfType<AudioManager>();
+            notCor = true;
+            StartCoroutine(MoveCorutine(frequency));
+            
         }
-        else Destroy(this.gameObject);
     }
-
-    void Update()
+    public void Turn(string _dir)
     {
-        if (canMove)
-            if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
-            {
-                canMove = false;
-                StartCoroutine (Mycorutine());
-            }
+        vector.Set(0, 0, vector.z);
+        switch (_dir)
+        {
+            case "UP": vector.y = 1f; break;
+            case "DOWN": vector.y = -1f; break;
+            case "LEFT": vector.x = -1f; break;
+            case "RIGHT": vector.x = 1f; break;
+        }
+        animator.SetFloat("DirX", vector.x); animator.SetFloat("DirY", vector.y);
     }
-    
-    private IEnumerator Mycorutine()
+    IEnumerator MoveCorutine(int frequency)
     {
-        while (Input.GetAxisRaw("Vertical") != 0 || Input.GetAxisRaw("Horizontal") != 0) {
-            if (Input.GetKey(KeyCode.LeftShift))
+        while(queue.Count != 0)
+        {
+            switch (frequency)
             {
-                applyRunSpeed = runSpeed;
-                applyRunFlag = true;
+                case 1: yield return new WaitForSeconds(4f); break;
+                case 2: yield return new WaitForSeconds(3f); break;
+                case 3: yield return new WaitForSeconds(2f); break;
+                case 4: yield return new WaitForSeconds(1f); break;
+                case 5: break;
             }
-            else
+            string _dir = queue.Dequeue();
+            vector.Set(0, 0, vector.z);
+            switch (_dir)
             {
-                applyRunFlag = false;
-                applyRunSpeed = 0;
+                case "UP": vector.y = 1f; break;
+                case "DOWN": vector.y = -1f; break;
+                case "LEFT": vector.x = -1f; break;
+                case "RIGHT": vector.x = 1f; break;
             }
 
-            vector.Set(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"), transform.position.z);
-            if (vector.x != 0) vector.y = 0;
-            if (vector.y != 0) vector.x = 0;
             animator.SetFloat("DirX", vector.x); animator.SetFloat("DirY", vector.y);
-
-            RaycastHit2D hit;
-            Vector2 start = transform.position;
-            Vector2 end = start+ new Vector2(vector.x * speed * walkCount, vector.y * speed * walkCount);
-            boxColider.enabled= false;
-            hit = Physics2D.Linecast(start, end, layerMask);
-            boxColider.enabled = true;
-
-            if (hit.transform != null) break;
+            while (true)
+            {
+                bool collisions = CheckCollision();
+                if (collisions)
+                {
+                    animator.SetBool("Walking", false);
+                    yield return new WaitForSeconds(1f);
+                }
+                else break;
+            }
 
             animator.SetBool("Walking", true);
+            boxColider.offset = new Vector2(0.7f * vector.x * speed * walkCount, 0.7f * vector.y * speed * walkCount);
 
-                int temp = Random.Range(1, 4);
-                switch (temp)
-                {
-                    case 1:
-                        _audioManager.Play(walkSound_1);
-                        break;
-                    case 2:
-                        _audioManager.Play(walkSound_2);
-                        break;
-                    case 3:
-                        _audioManager.Play(walkSound_3);
-                        break;
-                    case 4:
-                        _audioManager.Play(walkSound_4);
-                        break;
-                }
-                //audioSource.Play();
             while (currentWalkCount < walkCount)
             {
-                if (vector.x != 0) transform.Translate((applyRunSpeed + speed) * vector.x, 0, 0);
-                else if (vector.y != 0) transform.Translate(0, (applyRunSpeed + speed) * vector.y, 0);
-
-                if (applyRunFlag) currentWalkCount++;
+                transform.Translate(vector.x * speed, vector.y * speed, 0);
                 currentWalkCount++;
+                if (currentWalkCount == 12) boxColider.offset = Vector2.zero;
                 yield return new WaitForSeconds(0.01f);
-                
             }
             currentWalkCount = 0;
+            if (frequency != 5) animator.SetBool("Walking", false);
         }
+        notCor = false;
         animator.SetBool("Walking", false);
-        canMove = true;
+    }
+    protected bool CheckCollision()
+    {
+        RaycastHit2D hit;
+        Vector2 start = transform.position;
+        Vector2 end = start + new Vector2(vector.x * speed * walkCount, vector.y * speed * walkCount);
+        boxColider.enabled = false;
+        hit = Physics2D.Linecast(start, end, layerMask);
+        boxColider.enabled = true;
+        if (hit.transform != null) return true;
+        return false;
     }
 }

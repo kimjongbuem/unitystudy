@@ -11,12 +11,12 @@ public class OtheScenerTransterMap : MonoBehaviour
     */
     /*씬이동*/
     public string transferMapName; // 이동할 맵의 이름
-    private MovingObject thePlayer;
+    private PlayManager thePlayer;
     private CameraManager theCamera;
     // Start is called before the first frame update
     void Start()
     {
-        thePlayer = FindObjectOfType<MovingObject>();
+        thePlayer = FindObjectOfType<PlayManager>();
         /*
          * GetComponet(단일) vs FindObject (복수) // 해당 스크립트가 붙어있는 컴포넌트만 꺼내올수 있음. 
          */
