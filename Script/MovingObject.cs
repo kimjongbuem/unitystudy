@@ -21,8 +21,7 @@ public class MovingObject : MonoBehaviour
         if (!notCor)
         {
             notCor = true;
-            StartCoroutine(MoveCorutine(frequency));
-            
+            StartCoroutine(MoveCorutine(direction,frequency));
         }
     }
     public void Turn(string _dir)
@@ -37,9 +36,10 @@ public class MovingObject : MonoBehaviour
         }
         animator.SetFloat("DirX", vector.x); animator.SetFloat("DirY", vector.y);
     }
-    IEnumerator MoveCorutine(int frequency)
+    IEnumerator MoveCorutine(string direction,int frequency)
     {
-        while(queue.Count != 0)
+       
+        while (queue.Count != 0)
         {
             switch (frequency)
             {

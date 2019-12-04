@@ -20,23 +20,26 @@ public class PlayManager : MovingObject
     //public AudioClip walksound2;
     private AudioSource audioSource;
     private AudioManager _audioManager;
+    public bool dialogDontMove = true; 
     void Start()
     {
         if (instance == null)
         {
+            queue = new Queue<string>();
             instance = this;
             DontDestroyOnLoad(this.gameObject); // 이 오브젝트를 다른씬으로 갈때마다 파괴 ㄴㄴ
             boxColider = GetComponent<BoxCollider2D>();
             animator = GetComponent<Animator>();
             audioSource = GetComponent<AudioSource>();
             _audioManager = FindObjectOfType<AudioManager>();
+            characterName = "Player";
         }
         else Destroy(this.gameObject);
     }
 
     void Update()
     {
-        if (canMove)
+        if (canMove && dialogDontMove)
             if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
             {
                 canMove = false;

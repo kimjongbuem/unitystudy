@@ -8,11 +8,13 @@ public class SameSceneTransferMap : MonoBehaviour
     public BoxCollider2D targetBound;
     private CameraManager theCamera;
     private MovingObject thePlayer;
+    private FadeManager theFade;
     // Start is called before the first frame update
     void Start()
     {
         theCamera = FindObjectOfType<CameraManager>();
-        thePlayer = FindObjectOfType<MovingObject>();
+        thePlayer = FindObjectOfType<PlayManager>();
+        theFade = FindObjectOfType<FadeManager>();
     }
 
     // Update is called once per frame

@@ -15,6 +15,10 @@ public class OrderManager : MonoBehaviour
     {
         movingObjects = ToList();
     }
+    public void PlayerDialogDontMove(bool move)
+    {
+        thePlayer.dialogDontMove = move;
+    }
     public List<MovingObject> ToList()
     {
         List<MovingObject> tempList = new List<MovingObject>();
