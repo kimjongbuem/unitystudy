@@ -10,6 +10,7 @@ public class DialogManager : MonoBehaviour
     public SpriteRenderer dialogWindowsRenderer;
     public static DialogManager dialogManager;
 
+    private OrderManager theOrder;
     private List<string> listSetence;
     private List<Sprite> listSprite;
     private List<Sprite> listDialogWindows;
@@ -20,6 +21,8 @@ public class DialogManager : MonoBehaviour
     public string typeSound, enterSound;
     public bool talking = false;
     private bool keyActivate = false;
+    bool onlyText = false;
+
     #region Singleton
     private void Awake()
     {
@@ -38,12 +41,36 @@ public class DialogManager : MonoBehaviour
         listSprite = new List<Sprite>();
         listDialogWindows = new List<Sprite>();
         _audioManager = FindObjectOfType<AudioManager>();
+        theOrder = FindObjectOfType<OrderManager>();
         dialogCount = 0;
+    }
+    public void ShowText(string[] texts)
+    {
+        theOrder.PlayerDialogDontMove(false);
+        onlyText = true;
+        talking = true;
+        for (int i = 0; i < texts.Length; i++)
+        {
+            listSetence.Add(texts[i]);
+        }
+        StartCoroutine(StartOnlyTextCorutine());
+
+    }
+    IEnumerator StartOnlyTextCorutine()
+    {
+        keyActivate = true;
+        for (int i = 0; i < listSetence[dialogCount].Length; i++)
+        {
+            text.text += listSetence[dialogCount][i]; if (i % 6 == 1) _audioManager.Play(typeSound);
+            yield return new WaitForSeconds(0.1f);
+        }
     }
 
     // Update is called once per frame
     public void ShowDialog(Dialog dialog)
     {
+        theOrder.PlayerDialogDontMove(false);
+        onlyText = false;
         talking = true;
         for(int i = 0; i < dialog.sentence.Length; i++)
         {
@@ -104,6 +131,7 @@ public class DialogManager : MonoBehaviour
         animatorDialogWindow.SetBool("Appear", false);
         talking = false;
         animatorSpirte.SetBool("Appear", false);
+        theOrder.PlayerDialogDontMove(true);
     }
     void Update()
     {
@@ -122,7 +150,8 @@ public class DialogManager : MonoBehaviour
             else
             {
                 StopAllCoroutines();
-                StartCoroutine(StartDialogCorutine());
+                    if (onlyText) StartCoroutine(StartOnlyTextCorutine());
+                    else StartCoroutine(StartDialogCorutine());
             }
         }
     }

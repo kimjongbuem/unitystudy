@@ -65,6 +65,7 @@ public class PasswordManager : MonoBehaviour
         result = 0;
         anim.SetBool("Appear", true);
     }
+
     public bool GetResult()
     {
         return correctFlag;
@@ -87,7 +88,6 @@ public class PasswordManager : MonoBehaviour
         passwordText[selectedTextBox].text = temp.ToString();
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (keyInput)
@@ -140,6 +140,7 @@ public class PasswordManager : MonoBehaviour
         color.a = 1.0f;
         passwordText[selectedTextBox].color = color;
     }
+ 
     IEnumerator OXCorutine()
     {
         Color color = passwordText[0].color;
@@ -173,7 +174,6 @@ public class PasswordManager : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
         for (int i = 0; i <= arrayIndex; i++)
         {
-            arrayIndex = i;
             password_panels[i].SetActive(false);
             passwordText[i].text = "";
         }

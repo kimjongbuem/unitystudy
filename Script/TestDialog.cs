@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class TestDialog : MonoBehaviour
 {
+    public string[] texts;
     [SerializeField] public Dialog dialog;
     private DialogManager theDM; bool check;
     void Start()
@@ -16,7 +17,8 @@ public class TestDialog : MonoBehaviour
         if(collision.gameObject.name == "Player" && !check)
         {
             check = true;
-            theDM.ShowDialog(dialog);
+            //theDM.ShowDialog(dialog);
+            theDM.ShowText(texts);
         }
     }
 }
