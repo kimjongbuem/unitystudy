@@ -21,6 +21,7 @@ public class DatabaseManager : MonoBehaviour
     public float[] var;
     public string[] switchName;
     public bool[] switchFlags;
+    public List<Item> itemList = new List<Item>();
     void Start()
     {
         
