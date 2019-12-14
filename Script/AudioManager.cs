@@ -41,7 +41,7 @@ public class Sound {
 
 public class AudioManager : MonoBehaviour
 {
-    static AudioManager instance;
+    public static AudioManager instance;
     private void Awake()
     {
         if (instance == null)
