@@ -20,6 +20,8 @@ public class InventoryManager : MonoBehaviour
     private AudioManager theAudio;
     private DatabaseManager theDatabase;
     private OkOrCancel OOC;
+    private EquimentManager theEQ;
+
     public string key_sound;
     public string beep_sound;
     public string cancel_sound;
@@ -27,7 +29,7 @@ public class InventoryManager : MonoBehaviour
     public string enter_sound;
     public GameObject go_OOC;
     private InventroySlot[] slots;
-
+    public GameObject floatingText;
     private List<Item> inventoryItemList;
     private List<Item> inventoryCategoryList;
 
@@ -62,7 +64,10 @@ public class InventoryManager : MonoBehaviour
                 {
                     if(inventoryItemList[j].itemID == item_id)
                     {
-                        if(inventoryItemList[j].itemType == Item.ItemType.USE||
+                        var clone = Instantiate(floatingText, PlayManager.instance.transform.position, Quaternion.Euler(Vector3.zero));
+                        clone.GetComponent<FloatingText>().text.text = theDatabase.itemList[i].itemName + " " + count + "개 획득+";
+                        clone.transform.SetParent(this.transform);
+                        if (inventoryItemList[j].itemType == Item.ItemType.USE||
                             inventoryItemList[j].itemType == Item.ItemType.ETC ||
                             inventoryItemList[j].itemType == Item.ItemType.QUEST)
                         {
@@ -82,12 +87,18 @@ public class InventoryManager : MonoBehaviour
                             theDatabase.itemList[i].itemType == Item.ItemType.ETC ||
                             theDatabase.itemList[i].itemType == Item.ItemType.QUEST)
                 {
+                    var clone = Instantiate(floatingText, PlayManager.instance.transform.position, Quaternion.Euler(Vector3.zero));
+                    clone.GetComponent<FloatingText>().text.text = theDatabase.itemList[i].itemName + " " + count + "개 획득+";
+                    clone.transform.SetParent(this.transform);
                     inventoryItemList.Add(theDatabase.itemList[i]);
                     inventoryItemList[inventoryItemList.Count - 1].itemCount += count;
                     return;
                 }
                 else if (theDatabase.itemList[i].itemType == Item.ItemType.EQUIPIMENT)
                 {
+                    var clone = Instantiate(floatingText, PlayManager.instance.transform.position, Quaternion.Euler(Vector3.zero));
+                    clone.GetComponent<FloatingText>().text.text = theDatabase.itemList[i].itemName + " " + count + "개 획득+";
+                    clone.transform.SetParent(this.transform);
                     for (int c = 0; c < count; c++) inventoryItemList.Add(theDatabase.itemList[i]);
                     return;
                 }
@@ -99,6 +110,7 @@ public class InventoryManager : MonoBehaviour
 
     void Start()
     {
+        theEQ = FindObjectOfType<EquimentManager>();
         OOC = FindObjectOfType<OkOrCancel>();
         theDatabase = FindObjectOfType<DatabaseManager>();
         theOrder = FindObjectOfType<OrderManager>();
@@ -109,14 +121,6 @@ public class InventoryManager : MonoBehaviour
         // test code //
         inventoryItemList.Add(new Item(10001, "빨간 포션", "체력을 100만큼 회복!", Item.ItemType.USE));
         inventoryItemList.Add(new Item(10002, "파랑 포션", "마나를 100만큼 회복!", Item.ItemType.USE));
-        //inventoryItemList.Add(new Item(10003, "농축된 빨간 포션", "체력을 500만큼 회복!", Item.ItemType.USE));
-        //inventoryItemList.Add(new Item(10004, "농축된 파랑 포션", "마나를 300만큼 회복!", Item.ItemType.USE));
-        //inventoryItemList.Add(new Item(11001, "랜덤 상자", "랜덤으로 A급 장비아이템이 나온다!", Item.ItemType.USE));
-        //inventoryItemList.Add(new Item(20001, "도란 검", "기본 단검", Item.ItemType.EQUIPIMENT));
-        //inventoryItemList.Add(new Item(21001, "사파이어 반지", "마나와 민첩을 증가 시주는 반지!", Item.ItemType.EQUIPIMENT));
-        //inventoryItemList.Add(new Item(30001, "고대 유물 조각1", "고대 유물의 조각1 이다!", Item.ItemType.QUEST));
-        //inventoryItemList.Add(new Item(30002, "고대 유물 조각2", "고대 유물의 조각2 이다!", Item.ItemType.QUEST));
-        //inventoryItemList.Add(new Item(30003, "고대 유물", "말 그대로 오래된 고대 유물!", Item.ItemType.QUEST));
     }
     public void ShowCategory()
     {
@@ -363,12 +367,10 @@ public class InventoryManager : MonoBehaviour
                             preventExec = true;
                             if (selectedCategory == 0) // 소모품
                             {
-                                theAudio.Play(enter_sound);
-                                stopKeyInput = true; // 
-                                StartCoroutine(OOCCorutine());
+                                StartCoroutine(OOCCorutine("사용","취소"));
                             }else if(selectedCategory == 1)
                             {
-                                // 장비
+                                StartCoroutine(OOCCorutine("장착", "취소"));
                             }
                             else
                             {
@@ -392,10 +394,12 @@ public class InventoryManager : MonoBehaviour
             }
         }
     }
-    IEnumerator OOCCorutine()
+    IEnumerator OOCCorutine(string _up, string _down)
     {
+        theAudio.Play(enter_sound);
+        stopKeyInput = true; // 
         go_OOC.SetActive(true);
-        OOC.ShowTwoChoice("사용", "취소");
+        OOC.ShowTwoChoice(_up, _down);
         yield return new WaitUntil(() => !OOC.activate);
         if (OOC.GetResult())
         {
@@ -403,17 +407,28 @@ public class InventoryManager : MonoBehaviour
             {
                 if(inventoryItemList[i].itemID == inventoryCategoryList[selectedItem].itemID)
                 {
-                    theDatabase.UseItem(inventoryItemList[i].itemID);
-                    if (inventoryItemList[i].itemCount > 1) --inventoryItemList[i].itemCount;
-                    else inventoryItemList.RemoveAt(i);
-                    
-                    ShowItem();
-                    break;
+                    if(selectedCategory == 0)
+                    {
+                        theDatabase.UseItem(inventoryItemList[i].itemID);
+                        if (inventoryItemList[i].itemCount > 1) --inventoryItemList[i].itemCount;
+                        else inventoryItemList.RemoveAt(i);
+                        ShowItem();
+                        break;
+                    }else if (selectedCategory == 1)
+                    {
+                        theEQ.EquipItem(inventoryItemList[i]);
+                        inventoryItemList.RemoveAt(i);
+                        ShowItem();
+                    }
+                   
                 }
             }
         }
         stopKeyInput = false;
         go_OOC.SetActive(false);
     }
-
+    public void EquipToInventory(Item item)
+    {
+        inventoryItemList.Add(item);
+    }
 }

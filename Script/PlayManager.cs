@@ -10,6 +10,9 @@ public class PlayManager : MovingObject
     static public MovingObject instance;
     public float runSpeed;
 
+    private bool attacking = false;
+    public float attackdelay;
+    private float currentAttackdelay;
     public string walkSound_1;
     public string walkSound_2;
     public string walkSound_3;
@@ -39,17 +42,37 @@ public class PlayManager : MovingObject
 
     void Update()
     {
-        if (canMove && dialogDontMove)
+        if (canMove && dialogDontMove && !attacking)
             if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
             {
                 canMove = false;
                 StartCoroutine(Mycorutine());
             }
+
+        if(dialogDontMove && !attacking)
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                currentAttackdelay = attackdelay;
+                attacking = true;
+                animator.SetBool("Attacking", true);
+            }
+        }
+
+        if (attacking)
+        {
+            currentAttackdelay -= Time.deltaTime;
+            if(currentAttackdelay <= 0)
+            {
+                animator.SetBool("Attacking", false);
+                attacking = false;
+            }
+        }
     }
 
     private IEnumerator Mycorutine()
     {
-        while (Input.GetAxisRaw("Vertical") != 0 || Input.GetAxisRaw("Horizontal") != 0)
+        while (Input.GetAxisRaw("Vertical") != 0 || Input.GetAxisRaw("Horizontal") != 0 && !attacking)
         {
             if (Input.GetKey(KeyCode.LeftShift))
             {
