@@ -1,0 +1,5 @@
+직렬화 시 vector3로 데이터 세이브 시 에러가 뜸 그래서 float x 3 개 변수 선언해 줘야함.
+이진파일 - BinartFormatter , FileSystem ,Application.dataPath.
+bf.Serialize(file, data); file.close( )
+
+=> bf , FileMode.Open = >bf.Deseizeiable. 
